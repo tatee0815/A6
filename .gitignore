@@ -1,0 +1,14 @@
+# Godot-specific ignores
+*.import/
+export/
+*.translation
+
+# OS-specific ignores
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build artifacts
+*.exe
+*.zip
+*.pck
