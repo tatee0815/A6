@@ -44,6 +44,8 @@ A6/
 | Di chuyển lùi | `S` |
 | Quay trái | `A` |
 | Quay phải | `D` |
+| Quay đầu trái | `Q` |
+| Quay đầu phải | `E` |
 | Bắn | `Space` |
 | Bật/Tắt Cheat | `C` |
 
@@ -55,5 +57,3 @@ A6/
 - **Network:** ENetMultiplayerPeer (thông qua NetworkManager)
 
 ---
-
-*Phát triển bởi **tatee0815**.*
