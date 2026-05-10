@@ -1,0 +1,6 @@
+res://scripts/enemy_base.gd
+res://scripts/main.gd
+res://scripts/network_manager.gd
+res://scripts/player_tank.gd
+res://scenes/main.tscn
+res://scripts/power_up.gd

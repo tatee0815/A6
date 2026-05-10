@@ -1,0 +1,200 @@
+[gd_scene format=3 uid="uid://cqmain00001"]
+
+[ext_resource type="Script" uid="uid://khwrtxg0f7cc" path="res://scripts/main.gd" id="1_scr"]
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyMat_1"]
+sky_top_color = Color(0.35, 0.55, 0.82, 1)
+sky_horizon_color = Color(0.65, 0.75, 0.85, 1)
+ground_bottom_color = Color(0.15, 0.12, 0.1, 1)
+ground_horizon_color = Color(0.4, 0.35, 0.3, 1)
+
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("SkyMat_1")
+
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 2
+sky = SubResource("Sky_1")
+tonemap_mode = 2
+ssao_enabled = true
+glow_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="Mat_ground"]
+albedo_color = Color(0.35, 0.45, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+size = Vector3(60, 1, 60)
+
+[sub_resource type="BoxShape3D" id="BoxShape_ground"]
+size = Vector3(60, 1, 60)
+
+[sub_resource type="StandardMaterial3D" id="Mat_wall"]
+albedo_color = Color(0.5, 0.45, 0.4, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall"]
+size = Vector3(60, 3, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape_wall"]
+size = Vector3(60, 3, 1)
+
+[node name="Main" type="Node3D" unique_id=694560894]
+script = ExtResource("1_scr")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=488480991]
+environment = SubResource("Env_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1206672540]
+transform = Transform3D(0.85, 0.37, -0.37, 0, 0.71, 0.71, 0.53, -0.6, 0.6, 0, 20, 0)
+shadow_enabled = true
+
+[node name="Ground" type="StaticBody3D" parent="." unique_id=801025724]
+collision_layer = 2
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=1765565235]
+material_override = SubResource("Mat_ground")
+mesh = SubResource("BoxMesh_ground")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=944518337]
+shape = SubResource("BoxShape_ground")
+
+[node name="WallNorth" type="StaticBody3D" parent="." unique_id=544048233]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -30)
+collision_layer = 2
+
+[node name="Mesh" type="MeshInstance3D" parent="WallNorth" unique_id=1202283704]
+material_override = SubResource("Mat_wall")
+mesh = SubResource("BoxMesh_wall")
+
+[node name="Col" type="CollisionShape3D" parent="WallNorth" unique_id=1272542136]
+shape = SubResource("BoxShape_wall")
+
+[node name="WallSouth" type="StaticBody3D" parent="." unique_id=1743796334]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 30)
+collision_layer = 2
+
+[node name="Mesh" type="MeshInstance3D" parent="WallSouth" unique_id=1871121804]
+material_override = SubResource("Mat_wall")
+mesh = SubResource("BoxMesh_wall")
+
+[node name="Col" type="CollisionShape3D" parent="WallSouth" unique_id=263335339]
+shape = SubResource("BoxShape_wall")
+
+[node name="WallEast" type="StaticBody3D" parent="." unique_id=1232470621]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 30, 1.5, 0)
+collision_layer = 2
+
+[node name="Mesh" type="MeshInstance3D" parent="WallEast" unique_id=576665958]
+material_override = SubResource("Mat_wall")
+mesh = SubResource("BoxMesh_wall")
+
+[node name="Col" type="CollisionShape3D" parent="WallEast" unique_id=1313849170]
+shape = SubResource("BoxShape_wall")
+
+[node name="WallWest" type="StaticBody3D" parent="." unique_id=574828970]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -30, 1.5, 0)
+collision_layer = 2
+
+[node name="Mesh" type="MeshInstance3D" parent="WallWest" unique_id=655149017]
+material_override = SubResource("Mat_wall")
+mesh = SubResource("BoxMesh_wall")
+
+[node name="Col" type="CollisionShape3D" parent="WallWest" unique_id=568821294]
+shape = SubResource("BoxShape_wall")
+
+[node name="Obstacle1" type="StaticBody3D" parent="." unique_id=266309395]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1.5, 0)
+collision_layer = 2
+
+[node name="Mesh" type="MeshInstance3D" parent="Obstacle1" unique_id=1709444231]
+transform = Transform3D(0.98547584, 0, 0, 0, 1, 0, 0, 0, 1, -1.7773366, 0, 0)
+material_override = SubResource("Mat_wall")
+mesh = SubResource("BoxMesh_wall")
+
+[node name="Col" type="CollisionShape3D" parent="Obstacle1" unique_id=1289162526]
+shape = SubResource("BoxShape_wall")
+
+[node name="Obstacle2" type="StaticBody3D" parent="." unique_id=1528696778]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 8, 1.5, -8)
+collision_layer = 2
+
+[node name="Mesh" type="MeshInstance3D" parent="Obstacle2" unique_id=1175532471]
+material_override = SubResource("Mat_wall")
+mesh = SubResource("BoxMesh_wall")
+
+[node name="Col" type="CollisionShape3D" parent="Obstacle2" unique_id=83194452]
+shape = SubResource("BoxShape_wall")
+
+[node name="Players" type="Node3D" parent="." unique_id=1792664784]
+
+[node name="Enemies" type="Node3D" parent="." unique_id=203815872]
+
+[node name="PowerUps" type="Node3D" parent="." unique_id=700028358]
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=75736033]
+_spawnable_scenes = PackedStringArray("uid://cqplayer001")
+spawn_path = NodePath("../Players")
+
+[node name="UI" type="Control" parent="." unique_id=682994005]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -73.0
+offset_top = -11.0
+offset_right = -73.0
+offset_bottom = -11.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="MainMenu" type="PanelContainer" parent="UI" unique_id=1637171438]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -96.0
+offset_top = -133.0
+offset_right = 304.0
+offset_bottom = 227.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="UI/MainMenu" unique_id=1145499040]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="UI/MainMenu/VBox" unique_id=1546684494]
+layout_mode = 2
+text = "⚔ TANK BATTLE 3D ⚔"
+horizontal_alignment = 1
+
+[node name="Separator1" type="HSeparator" parent="UI/MainMenu/VBox" unique_id=1521295064]
+layout_mode = 2
+
+[node name="HostButton" type="Button" parent="UI/MainMenu/VBox" unique_id=339164260]
+layout_mode = 2
+text = "🖥  Host Game"
+
+[node name="IPInput" type="LineEdit" parent="UI/MainMenu/VBox" unique_id=164161221]
+layout_mode = 2
+placeholder_text = "Enter IP (default: 127.0.0.1)"
+
+[node name="JoinButton" type="Button" parent="UI/MainMenu/VBox" unique_id=143593785]
+layout_mode = 2
+text = "🌐  Join Game"
+
+[node name="Separator2" type="HSeparator" parent="UI/MainMenu/VBox" unique_id=1807058278]
+layout_mode = 2
+
+[node name="SinglePlayerButton" type="Button" parent="UI/MainMenu/VBox" unique_id=694141323]
+layout_mode = 2
+text = "🎮  Single Player"
+
+[node name="StatusLabel" type="Label" parent="UI/MainMenu/VBox" unique_id=126319801]
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 2

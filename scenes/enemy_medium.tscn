@@ -1,0 +1,98 @@
+[gd_scene format=3 uid="uid://cqenemymd01"]
+
+[ext_resource type="Script" path="res://scripts/enemy_base.gd" id="1_scr"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_body"]
+size = Vector3(2.4, 0.8, 3.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_turret"]
+size = Vector3(1.4, 0.6, 1.4)
+
+[sub_resource type="CylinderMesh" id="CylMesh_barrel"]
+top_radius = 0.14
+bottom_radius = 0.14
+height = 2.2
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_col"]
+size = Vector3(2.4, 1.5, 3.2)
+
+[sub_resource type="StandardMaterial3D" id="Mat_body"]
+albedo_color = Color(0.4, 0.15, 0.15, 1)
+metallic = 0.4
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_barrel"]
+albedo_color = Color(0.25, 0.08, 0.08, 1)
+metallic = 0.6
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="Mat_hpbar"]
+albedo_color = Color(0.1, 0.1, 0.1, 0.8)
+
+[node name="EnemyMediumTank" type="CharacterBody3D"]
+collision_layer = 1
+collision_mask = 3
+script = ExtResource("1_scr")
+move_speed = 4.0
+rotation_speed = 1.5
+max_health = 150
+fire_rate = 2.5
+attack_range = 22.0
+detection_range = 30.0
+bullet_damage = 35.0
+enemy_type = "Medium Tank"
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+mesh = SubResource("BoxMesh_body")
+material_override = SubResource("Mat_body")
+
+[node name="Turret" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+
+[node name="TurretMesh" type="MeshInstance3D" parent="Turret"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+mesh = SubResource("BoxMesh_turret")
+material_override = SubResource("Mat_body")
+
+[node name="Barrel" type="Node3D" parent="Turret"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+
+[node name="BarrelMesh" type="MeshInstance3D" parent="Turret/Barrel"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, -1.4)
+mesh = SubResource("CylMesh_barrel")
+material_override = SubResource("Mat_barrel")
+
+[node name="BulletSpawn" type="Marker3D" parent="Turret/Barrel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.6)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+shape = SubResource("BoxShape3D_col")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+path_desired_distance = 2.5
+target_desired_distance = 2.5
+
+[node name="DetectionTimer" type="Timer" parent="."]
+wait_time = 0.5
+autostart = true
+
+[node name="HealthBar3D" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+billboard = 1
+pixel_size = 0.01
+texture = null
+
+[node name="Fill" type="Sprite3D" parent="HealthBar3D"]
+billboard = 1
+modulate = Color(0.2, 0.9, 0.2, 1)
+pixel_size = 0.01
+texture = null
+
+[node name="TypeLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
+billboard = 1
+font_size = 28
+modulate = Color(0.9, 0.2, 0.2, 1)
+text = "Medium Tank"
