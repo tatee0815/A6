@@ -10,6 +10,7 @@ Một trò chơi chiến đấu xe tăng 3D đầy kịch tính được phát t
 - **🎮 Điều khiển mượt mà:** Hệ thống điều khiển xe tăng 3D trực quan (W/A/S/D).
 - **💥 Cơ chế chiến đấu:** Bắn đạn pháo với hiệu ứng vật lý và âm thanh sống động.
 - **🌐 Multiplayer:** Hỗ trợ kết nối mạng thông qua `NetworkManager`.
+- **⏸ Pause Menu:** Hệ thống tạm dừng trò chơi, thoát về menu chính hoặc thoát game.
 - **🛠️ Debug & Cheats:** Tích hợp sẵn các công cụ hỗ trợ phát triển (Cheat mode).
 - **🎨 Đồ họa hiện đại:** Sử dụng Forward+ renderer và MSAA 2x để tối ưu hóa hình ảnh.
 
@@ -48,6 +49,7 @@ A6/
 | Quay đầu phải | `E` |
 | Bắn | `Space` |
 | Bật/Tắt Cheat | `C` |
+| Tạm dừng (Pause) | `Esc` |
 
 ## 🛠️ Công nghệ sử dụng
 

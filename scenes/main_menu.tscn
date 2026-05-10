@@ -1,0 +1,84 @@
+[gd_scene format=3 uid="uid://cqmainmenu001"]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_scr"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.12, 0.14, 0.18, 1)
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_scr")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="Title" type="Label" parent="CenterContainer/PanelContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 36
+text = "⚔ TANK BATTLE 3D"
+horizontal_alignment = 1
+
+[node name="Separator" type="HSeparator" parent="CenterContainer/PanelContainer/VBox"]
+layout_mode = 2
+
+[node name="HostButton" type="Button" parent="CenterContainer/PanelContainer/VBox"]
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+text = "🖥  Host Game"
+
+[node name="IPInput" type="LineEdit" parent="CenterContainer/PanelContainer/VBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+placeholder_text = "Enter IP (default: 127.0.0.1)"
+alignment = 1
+
+[node name="JoinButton" type="Button" parent="CenterContainer/PanelContainer/VBox"]
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+text = "🌐  Join Game"
+
+[node name="Separator2" type="HSeparator" parent="CenterContainer/PanelContainer/VBox"]
+layout_mode = 2
+
+[node name="SinglePlayerButton" type="Button" parent="CenterContainer/PanelContainer/VBox"]
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+text = "🎮  Single Player"
+
+[node name="StatusLabel" type="Label" parent="CenterContainer/PanelContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.4, 1)
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[connection signal="pressed" from="CenterContainer/PanelContainer/VBox/HostButton" to="." method="_on_host_button_pressed"]
+[connection signal="pressed" from="CenterContainer/PanelContainer/VBox/JoinButton" to="." method="_on_join_button_pressed"]
+[connection signal="pressed" from="CenterContainer/PanelContainer/VBox/SinglePlayerButton" to="." method="_on_single_player_button_pressed"]

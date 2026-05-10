@@ -36,24 +36,20 @@ const POWERUP_POSITIONS: Array[Dictionary] = [
 
 # ── Cached UI refs ──────────────────────────────────────────
 @onready var main_menu: Control = $UI/MainMenu
-@onready var ip_input: LineEdit = $UI/MainMenu/VBox/IPInput
-@onready var status_label: Label = $UI/MainMenu/VBox/StatusLabel
-@onready var host_btn: Button = $UI/MainMenu/VBox/HostButton
-@onready var join_btn: Button = $UI/MainMenu/VBox/JoinButton
-@onready var single_btn: Button = $UI/MainMenu/VBox/SinglePlayerButton
 @onready var players_node: Node3D = $Players
 @onready var enemies_node: Node3D = $Enemies
 @onready var powerups_node: Node3D = $PowerUps
+@onready var pause_menu: Control = $UI/PauseMenu
 
 var _spawn_index: int = 0
 
 
 # ── Lifecycle ────────────────────────────────────────────────
 func _ready() -> void:
-	# Connect UI buttons
-	host_btn.pressed.connect(_on_host_pressed)
-	join_btn.pressed.connect(_on_join_pressed)
-	single_btn.pressed.connect(_on_single_player_pressed)
+	# Connect Main Menu signals
+	main_menu.host_requested.connect(_on_host_pressed)
+	main_menu.join_requested.connect(_on_join_pressed)
+	main_menu.single_player_requested.connect(_on_single_player_pressed)
 
 	# Connect network signals
 	NetworkManager.player_connected.connect(_on_player_connected)
@@ -61,6 +57,9 @@ func _ready() -> void:
 	NetworkManager.connection_succeeded.connect(_on_connection_succeeded)
 	NetworkManager.connection_failed.connect(_on_connection_failed)
 	NetworkManager.server_disconnected.connect(_on_server_disconnected)
+
+	# Setup Mouse
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 	# Configure MultiplayerSpawner for Players
 	var spawner: MultiplayerSpawner = $MultiplayerSpawner
@@ -83,28 +82,34 @@ func _ready() -> void:
 	add_child(powerup_spawner)
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"): # Usually Escape
+		if not main_menu.visible:
+			if pause_menu.visible:
+				pause_menu.close()
+			else:
+				pause_menu.open()
+
+
 # ── UI Callbacks ─────────────────────────────────────────────
 func _on_host_pressed() -> void:
 	var err := NetworkManager.host_game()
 	if err == OK:
-		status_label.text = "Hosting… Waiting for players."
+		main_menu.set_status("Hosting… Waiting for players.")
 		_hide_menu()
 		# Also spawn enemies & items in host mode
 		_spawn_enemies()
 		_spawn_powerups()
 	else:
-		status_label.text = "Failed to host: %s" % error_string(err)
+		main_menu.set_status("Failed to host: %s" % error_string(err))
 
 
-func _on_join_pressed() -> void:
-	var address: String = ip_input.text.strip_edges()
-	if address.is_empty():
-		address = "127.0.0.1"
+func _on_join_pressed(address: String) -> void:
 	var err := NetworkManager.join_game(address)
 	if err == OK:
-		status_label.text = "Connecting to %s…" % address
+		main_menu.set_status("Connecting to %s…" % address)
 	else:
-		status_label.text = "Failed to join: %s" % error_string(err)
+		main_menu.set_status("Failed to join: %s" % error_string(err))
 
 
 func _on_single_player_pressed() -> void:
@@ -121,7 +126,7 @@ func _hide_menu() -> void:
 
 func _show_menu() -> void:
 	main_menu.visible = true
-	status_label.text = ""
+	main_menu.set_status("")
 
 
 # ── Network Callbacks ────────────────────────────────────────
@@ -143,19 +148,23 @@ func _on_connection_succeeded() -> void:
 
 
 func _on_connection_failed() -> void:
-	status_label.text = "Connection failed! Check IP and try again."
+	main_menu.set_status("Connection failed! Check IP and try again.")
 
 
 func _on_server_disconnected() -> void:
-	# Clean up all players and return to menu
+	_clear_entities()
+	_show_menu()
+	main_menu.set_status("Server disconnected.")
+
+
+func _clear_entities() -> void:
+	# Clean up all players, enemies, and power-ups
 	for child in players_node.get_children():
 		child.queue_free()
 	for child in enemies_node.get_children():
 		child.queue_free()
 	for child in powerups_node.get_children():
 		child.queue_free()
-	_show_menu()
-	status_label.text = "Server disconnected."
 
 
 # ── Player Spawning ──────────────────────────────────────────

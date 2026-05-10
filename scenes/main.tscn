@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://cqmain00001"]
 
 [ext_resource type="Script" uid="uid://khwrtxg0f7cc" path="res://scripts/main.gd" id="1_scr"]
+[ext_resource type="PackedScene" uid="uid://cqpause001" path="res://scenes/pause_menu.tscn" id="2_pause"]
+[ext_resource type="PackedScene" uid="uid://cqmainmenu001" path="res://scenes/main_menu.tscn" id="3_menu"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat_1"]
 sky_top_color = Color(0.35, 0.55, 0.82, 1)
@@ -141,60 +143,13 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -73.0
-offset_top = -11.0
-offset_right = -73.0
-offset_bottom = -11.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="MainMenu" type="PanelContainer" parent="UI" unique_id=1637171438]
+[node name="PauseMenu" parent="UI" instance=ExtResource("2_pause")]
+visible = false
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -96.0
-offset_top = -133.0
-offset_right = 304.0
-offset_bottom = 227.0
-grow_horizontal = 2
-grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="UI/MainMenu" unique_id=1145499040]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="TitleLabel" type="Label" parent="UI/MainMenu/VBox" unique_id=1546684494]
-layout_mode = 2
-text = "⚔ TANK BATTLE 3D ⚔"
-horizontal_alignment = 1
-
-[node name="Separator1" type="HSeparator" parent="UI/MainMenu/VBox" unique_id=1521295064]
-layout_mode = 2
-
-[node name="HostButton" type="Button" parent="UI/MainMenu/VBox" unique_id=339164260]
-layout_mode = 2
-text = "🖥  Host Game"
-
-[node name="IPInput" type="LineEdit" parent="UI/MainMenu/VBox" unique_id=164161221]
-layout_mode = 2
-placeholder_text = "Enter IP (default: 127.0.0.1)"
-
-[node name="JoinButton" type="Button" parent="UI/MainMenu/VBox" unique_id=143593785]
-layout_mode = 2
-text = "🌐  Join Game"
-
-[node name="Separator2" type="HSeparator" parent="UI/MainMenu/VBox" unique_id=1807058278]
-layout_mode = 2
-
-[node name="SinglePlayerButton" type="Button" parent="UI/MainMenu/VBox" unique_id=694141323]
-layout_mode = 2
-text = "🎮  Single Player"
-
-[node name="StatusLabel" type="Label" parent="UI/MainMenu/VBox" unique_id=126319801]
-layout_mode = 2
-horizontal_alignment = 1
-autowrap_mode = 2
+[node name="MainMenu" parent="UI" instance=ExtResource("3_menu")]
+layout_mode = 1

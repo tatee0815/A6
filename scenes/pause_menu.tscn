@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://d05e1wmewbvv7"]
+
+[ext_resource type="Script" uid="uid://5bgy8fcgixer" path="res://scripts/pause_menu.gd" id="1_scr"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0, 0, 0, 0.470588)
+
+[node name="PauseMenu" type="Control" unique_id=1253160852]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_scr")
+
+[node name="BackgroundOverlay" type="Panel" parent="." unique_id=1848295657]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=454412656]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=524627514]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/PanelContainer" unique_id=1199036989]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="Title" type="Label" parent="CenterContainer/PanelContainer/VBox" unique_id=1628236056]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "⏸ PAUSED"
+horizontal_alignment = 1
+
+[node name="Separator" type="HSeparator" parent="CenterContainer/PanelContainer/VBox" unique_id=405370328]
+layout_mode = 2
+
+[node name="ResumeButton" type="Button" parent="CenterContainer/PanelContainer/VBox" unique_id=1136397386]
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+text = "▶  Resume"
+
+[node name="QuitToMenuButton" type="Button" parent="CenterContainer/PanelContainer/VBox" unique_id=186233090]
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+text = "🏠  Quit to Main Menu"
+
+[node name="QuitGameButton" type="Button" parent="CenterContainer/PanelContainer/VBox" unique_id=1733067716]
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+text = "❌  Quit Game"
+
+[connection signal="pressed" from="CenterContainer/PanelContainer/VBox/ResumeButton" to="." method="_on_resume_button_pressed"]
+[connection signal="pressed" from="CenterContainer/PanelContainer/VBox/QuitToMenuButton" to="." method="_on_quit_to_menu_button_pressed"]
+[connection signal="pressed" from="CenterContainer/PanelContainer/VBox/QuitGameButton" to="." method="_on_quit_game_button_pressed"]

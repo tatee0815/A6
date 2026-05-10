@@ -47,15 +47,19 @@ const PLAYER_COLORS: Array[Color] = [
 
 
 # ── Lifecycle ────────────────────────────────────────────────
+func _enter_tree() -> void:
+	# Set multiplayer authority to the owning player.
+	# In Godot 4, this must happen in _enter_tree (or during the spawner's callback)
+	# to avoid "unable to process pending spawn" errors.
+	set_multiplayer_authority(player_id)
+
+
 func _ready() -> void:
 	# Spawner sets the node name to the peer_id string
 	var id_from_name := name.to_int()
 	if id_from_name > 0:
 		player_id = id_from_name
 	
-	# Set multiplayer authority to the owning player
-	set_multiplayer_authority(player_id)
-
 	# Name tag
 	if name_label:
 		name_label.text = "Player %d" % player_id
