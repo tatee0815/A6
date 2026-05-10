@@ -23,6 +23,12 @@ properties/0/replication_mode = 1
 properties/1/path = NodePath(".:rotation")
 properties/1/spawn = true
 properties/1/replication_mode = 1
+properties/2/path = NodePath(".:health")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+properties/3/path = NodePath("Turret:rotation")
+properties/3/spawn = true
+properties/3/replication_mode = 1
 
 [sub_resource type="LabelSettings" id="LabelSettings_health"]
 font_size = 22
@@ -132,3 +138,13 @@ offset_bottom = 50.0
 horizontal_alignment = 1
 label_settings = SubResource("LabelSettings_cheat")
 text = ""
+
+[node name="ScoreLabel" type="Label" parent="HUD"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 85.0
+offset_right = 280.0
+offset_bottom = 115.0
+theme_override_colors/font_color = Color(1, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 20
+text = "Kills: 0"

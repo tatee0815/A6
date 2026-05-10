@@ -38,6 +38,10 @@ const BULLET_SCENE: PackedScene = preload("res://scenes/bullet.tscn")
 @onready var type_label: Label3D = $TypeLabel
 
 
+func _enter_tree() -> void:
+	_setup_multiplayer_synchronizer()
+
+
 func _ready() -> void:
 	health = max_health
 	# NavigationAgent3D settings
@@ -54,7 +58,6 @@ func _ready() -> void:
 		type_label.text = enemy_type
 
 	_update_health_bar()
-	_setup_multiplayer_synchronizer()
 
 
 func _setup_multiplayer_synchronizer() -> void:
@@ -69,10 +72,14 @@ func _setup_multiplayer_synchronizer() -> void:
 	config.add_property(".:visible")
 	
 	sync.replication_config = config
+	# Enemies are always controlled by the server
+	sync.set_multiplayer_authority(1)
 	add_child(sync)
 
 
 func _physics_process(delta: float) -> void:
+	if not multiplayer.multiplayer_peer:
+		return
 	# Only process AI on the server (or in single player)
 	if not multiplayer.is_server():
 		_update_health_bar()
@@ -142,9 +149,9 @@ func _state_chase(delta: float) -> void:
 	
 	direction.y = 0.0
 
-	# Rotate towards movement direction
+	# Rotate towards movement direction (Godot forward is -Z)
 	if direction.length() > 0.01:
-		var target_angle: float = atan2(direction.x, direction.z)
+		var target_angle: float = atan2(direction.x, direction.z) + PI
 		rotation.y = lerp_angle(rotation.y, target_angle, rotation_speed * delta)
 
 	velocity.x = direction.x * move_speed
@@ -169,11 +176,11 @@ func _state_attack(delta: float) -> void:
 		current_state = State.CHASE
 		return
 
-	# Face the target
+	# Face the target (Godot forward is -Z)
 	var to_target: Vector3 = (target_player.global_position - global_position).normalized()
 	to_target.y = 0.0
 	if to_target.length() > 0.01:
-		var target_angle: float = atan2(to_target.x, to_target.z)
+		var target_angle: float = atan2(to_target.x, to_target.z) + PI
 		rotation.y = lerp_angle(rotation.y, target_angle, rotation_speed * 2.0 * delta)
 
 	# Stop moving while attacking
@@ -206,7 +213,7 @@ func _spawn_bullet() -> void:
 	bullet.damage = bullet_damage
 
 
-func take_damage(amount: float) -> void:
+func take_damage(amount: float, attacker_id: int = -1) -> void:
 	# Only the server processes damage
 	if not multiplayer.is_server():
 		return
@@ -214,17 +221,24 @@ func take_damage(amount: float) -> void:
 		return
 	health -= int(amount)
 	health = max(health, 0)
-	# Health is synced via MultiplayerSynchronizer, 
-	# but we update health bar locally on everyone via property change or _process
+	
 	if health <= 0:
-		_die()
+		_die(attacker_id)
 
 
-func _die() -> void:
+func _die(attacker_id: int = -1) -> void:
 	if not multiplayer.is_server():
 		return
 	is_dead = true
 	visible = false
+	
+	# Reward the attacker if it's a player
+	if attacker_id != -1:
+		var players = get_tree().get_nodes_in_group("players")
+		for p in players:
+			if p.get("player_id") == attacker_id:
+				p.add_score(1)
+				break
 	# Respawn after 8 seconds
 	await get_tree().create_timer(8.0).timeout
 	_respawn()
@@ -282,3 +296,11 @@ func _update_health_bar() -> void:
 			health_bar_fill.modulate = Color(0.9, 0.9, 0.2)
 		else:
 			health_bar_fill.modulate = Color(0.9, 0.2, 0.2)
+
+
+# Add this to ensure client updates health bar when health is synced
+func _process(_delta: float) -> void:
+	if not multiplayer.multiplayer_peer:
+		return
+	if not multiplayer.is_server():
+		_update_health_bar()

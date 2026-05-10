@@ -62,24 +62,9 @@ func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 	# Configure MultiplayerSpawner for Players
-	var spawner: MultiplayerSpawner = $MultiplayerSpawner
-	spawner.spawn_path = NodePath("../Players")
-	spawner.spawn_function = _spawn_player_for_peer
-
-	# Create Spawner for Enemies
-	var enemy_spawner := MultiplayerSpawner.new()
-	enemy_spawner.name = "EnemySpawner"
-	enemy_spawner.spawn_path = NodePath("../Enemies")
-	enemy_spawner.add_spawnable_scene(ENEMY_LIGHT.resource_path)
-	enemy_spawner.add_spawnable_scene(ENEMY_MEDIUM.resource_path)
-	add_child(enemy_spawner)
-
-	# Create Spawner for PowerUps
-	var powerup_spawner := MultiplayerSpawner.new()
-	powerup_spawner.name = "PowerUpSpawner"
-	powerup_spawner.spawn_path = NodePath("../PowerUps")
-	powerup_spawner.add_spawnable_scene(POWER_UP_SCENE.resource_path)
-	add_child(powerup_spawner)
+	var player_spawner: MultiplayerSpawner = $PlayerSpawner
+	player_spawner.spawn_path = NodePath("../Players")
+	player_spawner.spawn_function = _spawn_player_for_peer
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -170,7 +155,7 @@ func _clear_entities() -> void:
 # ── Player Spawning ──────────────────────────────────────────
 func _do_spawn(peer_id: int) -> void:
 	# Use MultiplayerSpawner to replicate across all peers
-	var spawner: MultiplayerSpawner = $MultiplayerSpawner
+	var spawner: MultiplayerSpawner = $PlayerSpawner
 	spawner.spawn(peer_id)
 
 

@@ -10,13 +10,14 @@ extends CharacterBody3D
 @export var player_id: int = 1
 
 # ── Movement tuning ─────────────────────────────────────────
-const MOVE_SPEED: float = 10.0
-const ROTATION_SPEED: float = 2.5
+const MOVE_SPEED: float = 7.0
+const ROTATION_SPEED: float = 2.0
 const GRAVITY: float = 20.0
 
 # ── Combat ───────────────────────────────────────────────────
 var health: int = 100
 var max_health: int = 100
+var score: int = 0
 var is_dead: bool = false
 var can_shoot: bool = true
 var shoot_cooldown: float = 0.4
@@ -32,6 +33,7 @@ var cheat_speed_mult: float = 1.0
 @onready var camera: Camera3D = $CameraPivot/Camera3D
 @onready var health_bar: ProgressBar = $HUD/HealthBar
 @onready var health_label: Label = $HUD/HealthContainer/HealthLabel
+@onready var score_label: Label = $HUD/ScoreLabel
 @onready var cheat_label: Label = $HUD/CheatLabel
 @onready var name_label: Label3D = $NameLabel
 
@@ -88,6 +90,9 @@ func _setup_sync_properties() -> void:
 		# Health (int)
 		if not config.has_property(".:health"):
 			config.add_property(".:health")
+		# Score (int)
+		if not config.has_property(".:score"):
+			config.add_property(".:score")
 
 
 func _physics_process(delta: float) -> void:
@@ -131,7 +136,7 @@ func _physics_process(delta: float) -> void:
 		turret_rot -= 1.0
 	turret.rotate_y(turret_rot * ROTATION_SPEED * delta)
 
-	# ── Shooting (Space) ──
+	# ── Shooting (Space / Mouse Click) ──
 	if Input.is_action_just_pressed("shoot") and can_shoot:
 		_request_shoot.rpc()
 		_start_cooldown()
@@ -142,6 +147,14 @@ func _physics_process(delta: float) -> void:
 		cheat_speed_mult = 2.0 if is_god_mode else 1.0
 
 	_update_hud()
+
+
+func _process(_delta: float) -> void:
+	if not multiplayer.multiplayer_peer:
+		return
+	# On clients, ensure the HUD reflects the synced health
+	if not is_multiplayer_authority():
+		_update_hud()
 
 
 # ── Shooting ─────────────────────────────────────────────────
@@ -170,33 +183,57 @@ func _start_cooldown() -> void:
 
 
 # ── Damage & Death ───────────────────────────────────────────
-func apply_damage(amount: float, _attacker_id: int) -> void:
+func apply_damage(amount: float, attacker_id: int) -> void:
 	# Only the server processes damage
 	if not multiplayer.is_server():
 		return
 	if is_god_mode or is_dead:
 		return
 	
-	health -= int(amount)
-	health = max(health, 0)
+	var new_health = health - int(amount)
+	new_health = max(new_health, 0)
+	_sync_health.rpc(new_health)
 	
-	if health <= 0:
-		_die()
+	if new_health <= 0:
+		_die(attacker_id)
+
+@rpc("any_peer", "call_local", "reliable")
+func _sync_health(new_health: int) -> void:
+	var sender_id = multiplayer.get_remote_sender_id()
+	# Only allow the server (id 1) or local calls (id 0) to sync health
+	if sender_id != 1 and sender_id != 0:
+		return
+	health = new_health
 
 
-func _die() -> void:
+func _die(attacker_id: int) -> void:
 	# Server initiates death
 	_die_sync.rpc()
+	
+	# Reward the attacker
+	if attacker_id != -1 and attacker_id != player_id:
+		# Search in all players
+		var players = get_tree().get_nodes_in_group("players")
+		for p in players:
+			if p.get("player_id") == attacker_id:
+				p.add_score(1)
+				break
 
 
-@rpc("call_local", "reliable")
+@rpc("any_peer", "call_local", "reliable")
 func _die_sync() -> void:
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id != 1 and sender_id != 0:
+		return
 	is_dead = true
 	visible = false
 	# Only the authority (owning player) handles respawn timer
 	if is_multiplayer_authority():
 		await get_tree().create_timer(3.0).timeout
-		_respawn_request.rpc_id(1)
+		if multiplayer.is_server():
+			_respawn_request()
+		else:
+			_respawn_request.rpc_id(1)
 
 
 @rpc("any_peer", "reliable")
@@ -207,19 +244,44 @@ func _respawn_request() -> void:
 	_respawn_sync.rpc()
 
 
-@rpc("call_local", "reliable")
+@rpc("any_peer", "call_local", "reliable")
 func _respawn_sync() -> void:
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id != 1 and sender_id != 0:
+		return
 	health = max_health
 	is_dead = false
 	visible = true
 	if is_multiplayer_authority():
-		position = Vector3(randf_range(-12, 12), 2.0, randf_range(-12, 12))
+		# Use predefined spawn points from main scene to avoid walls
+		var main_node = get_tree().current_scene
+		if main_node and "SPAWN_POINTS" in main_node:
+			var pts: Array = main_node.SPAWN_POINTS
+			var base_pos = pts[randi() % pts.size()]
+			# Small random offset to avoid exact overlapping with other tanks
+			position = base_pos + Vector3(randf_range(-1.5, 1.5), 0, randf_range(-1.5, 1.5))
+		else:
+			position = Vector3(randf_range(-12, 12), 2.0, randf_range(-12, 12))
 	_update_hud()
 
 
 # ── Heal / Boost (called by power-ups in Phase 2) ───────────
 func heal(amount: int) -> void:
-	health = min(health + amount, max_health)
+	if not multiplayer.is_server(): return
+	var new_health = min(health + amount, max_health)
+	_sync_health.rpc(new_health)
+
+
+func add_score(amount: int) -> void:
+	if not multiplayer.is_server(): return
+	var new_score = score + amount
+	_sync_score.rpc(new_score)
+
+@rpc("any_peer", "call_local", "reliable")
+func _sync_score(new_score: int) -> void:
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id != 1 and sender_id != 0: return
+	score = new_score
 	_update_hud()
 
 
@@ -256,6 +318,8 @@ func _update_hud() -> void:
 		health_bar.value = float(health) / float(max_health) * 100.0
 	if health_label:
 		health_label.text = "%d / %d" % [health, max_health]
+	if score_label:
+		score_label.text = "Kills: %d" % score
 	if cheat_label:
 		if is_god_mode:
 			cheat_label.text = "[ GOD MODE + SPEED HACK ]"

@@ -1,3 +1,10 @@
 res://scripts/player_tank.gd
 res://scripts/main.gd
 res://scenes/pause_menu.tscn
+res://scenes/enemy_light.tscn
+res://scenes/enemy_medium.tscn
+res://scripts/bullet.gd
+res://scripts/enemy_base.gd
+res://scenes/player_tank.tscn
+res://scenes/power_up.tscn
+res://scenes/main.tscn
